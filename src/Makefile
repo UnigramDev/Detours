@@ -108,11 +108,11 @@ $(INCD)\detours.h : detours.h
 $(INCD)\detver.h : detver.h
     copy detver.h $@
 
-$(OBJD)\detours.obj : detours.cpp detours.h
+$(OBJD)\detours.obj : detours.cpp detours.h missingimports.h
 $(OBJD)\modules.obj : modules.cpp detours.h
 $(OBJD)\disasm.obj : disasm.cpp detours.h
-$(OBJD)\image.obj : image.cpp detours.h
-$(OBJD)\creatwth.obj : creatwth.cpp uimports.cpp detours.h
+$(OBJD)\image.obj : image.cpp detours.h missingimports.h
+$(OBJD)\creatwth.obj : creatwth.cpp uimports.cpp detours.h missingimports.h
 $(OBJD)\disolx86.obj: disasm.cpp detours.h
 $(OBJD)\disolx64.obj: disasm.cpp detours.h
 $(OBJD)\disolia64.obj: disasm.cpp detours.h

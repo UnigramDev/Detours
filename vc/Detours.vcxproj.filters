@@ -356,6 +356,9 @@
     <ClInclude Include="..\src\detver.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\missingimports.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\samples\tracebld\tracebld.h">
       <Filter>samples\tracebld</Filter>
     </ClInclude>

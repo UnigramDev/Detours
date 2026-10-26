@@ -952,6 +952,84 @@ LONG InterlockedCompareExchange(_Inout_ LONG *ptr, _In_ LONG nval, _In_ LONG ova
 #pragma warning(pop)
 #endif
 
+// DbgHelp.h declares these for the desktop partition only. An app-container build still
+// loads dbghelp.dll at run time, so it declares the subset Detours uses here.
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define IMAGEAPI
+#define DBHLPAPI
+
+typedef enum {
+    SymNone = 0,
+    SymCoff,
+    SymCv,
+    SymPdb,
+    SymExport,
+    SymDeferred,
+    SymSym,       // .sym file
+    SymDia,
+    SymVirtual,
+    NumSymTypes
+} SYM_TYPE;
+
+typedef struct _SYMBOL_INFO {
+    ULONG       SizeOfStruct;
+    ULONG       TypeIndex;        // Type Index of symbol
+    ULONG64     Reserved[2];
+    ULONG       Index;
+    ULONG       Size;
+    ULONG64     ModBase;          // Base Address of module comtaining this symbol
+    ULONG       Flags;
+    ULONG64     Value;            // Value of symbol, ValuePresent should be 1
+    ULONG64     Address;          // Address of symbol including base address of module
+    ULONG       Register;         // register holding value or pointer to value
+    ULONG       Scope;            // scope of the symbol
+    ULONG       Tag;              // pdb classification
+    ULONG       NameLen;          // Actual length of name
+    ULONG       MaxNameLen;
+    CHAR        Name[1];          // Name of symbol
+} SYMBOL_INFO, * PSYMBOL_INFO;
+
+typedef struct _IMAGEHLP_MODULE64 {
+    DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE64)
+    DWORD64  BaseOfImage;            // base load address of module
+    DWORD    ImageSize;              // virtual size of the loaded module
+    DWORD    TimeDateStamp;          // date/time stamp from pe header
+    DWORD    CheckSum;               // checksum from the pe header
+    DWORD    NumSyms;                // number of symbols in the symbol table
+    SYM_TYPE SymType;                // type of symbols loaded
+    CHAR     ModuleName[32];         // module name
+    CHAR     ImageName[256];         // image name
+    CHAR     LoadedImageName[256];   // symbol file name
+    // new elements: 07-Jun-2002
+    CHAR     LoadedPdbName[256];     // pdb file name
+    DWORD    CVSig;                  // Signature of the CV record in the debug directories
+    CHAR     CVData[MAX_PATH * 3];   // Contents of the CV record
+    DWORD    PdbSig;                 // Signature of PDB
+    GUID     PdbSig70;               // Signature of PDB (VC 7 and up)
+    DWORD    PdbAge;                 // DBI age of pdb
+    BOOL     PdbUnmatched;           // loaded an unmatched pdb
+    BOOL     DbgUnmatched;           // loaded an unmatched dbg
+    BOOL     LineNumbers;            // we have line number information
+    BOOL     GlobalSymbols;          // we have internal symbol information
+    BOOL     TypeInfo;               // we have type information
+    // new elements: 17-Dec-2003
+    BOOL     SourceIndexed;          // pdb supports source server
+    BOOL     Publics;                // contains public symbols
+    // new element: 15-Jul-2009
+    DWORD    MachineType;            // IMAGE_FILE_MACHINE_XXX from ntimage.h and winnt.h
+    DWORD    Reserved;               // Padding - don't remove.
+} IMAGEHLP_MODULE64, * PIMAGEHLP_MODULE64;
+
+typedef struct API_VERSION {
+    USHORT  MajorVersion;
+    USHORT  MinorVersion;
+    USHORT  Revision;
+    USHORT  Reserved;
+} API_VERSION, * LPAPI_VERSION;
+
+#define API_VERSION_NUMBER 12
+#endif // !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 #ifdef IMAGEAPI // defined by DBGHELP.H
 typedef LPAPI_VERSION (NTAPI *PF_ImagehlpApiVersionEx)(_In_ LPAPI_VERSION AppVersion);
 

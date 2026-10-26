@@ -616,6 +616,7 @@ nmake</Command>
     <ClInclude Include="..\samples\tracebld\tracebld.h" />
     <ClInclude Include="..\src\detours.h" />
     <ClInclude Include="..\src\detver.h" />
+    <ClInclude Include="..\src\missingimports.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
