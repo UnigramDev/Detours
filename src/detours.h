@@ -37,7 +37,35 @@
 #define _KERNEL32_ 1
 #define _USER32_ 1
 
+// An app-container build gets VirtualAlloc and VirtualProtect as inline calls to their FromApp
+// variants, which refuse executable memory without the codeGeneration capability - and every
+// trampoline needs it. Detours renames those wrappers out of the way and calls the kernel32
+// exports, which app containers can still reach.
+#ifdef DETOURS_INTERNAL
+#include <winapifamily.h>
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define DETOURS_APP_MEMORY
+#define VirtualAlloc DetourAppVirtualAlloc
+#define VirtualProtect DetourAppVirtualProtect
+#endif
+#endif
+
 #include <windows.h>
+
+#ifdef DETOURS_APP_MEMORY
+#undef VirtualAlloc
+#undef VirtualProtect
+#ifdef __cplusplus
+extern "C" {
+#endif
+LPVOID WINAPI VirtualAlloc(_In_opt_ LPVOID lpAddress, _In_ SIZE_T dwSize,
+                           _In_ DWORD flAllocationType, _In_ DWORD flProtect);
+BOOL WINAPI VirtualProtect(_In_ LPVOID lpAddress, _In_ SIZE_T dwSize,
+                           _In_ DWORD flNewProtect, _Out_ PDWORD lpflOldProtect);
+#ifdef __cplusplus
+}
+#endif
+#endif
 #if (_MSC_VER < 1310)
 #else
 #pragma warning(push)
